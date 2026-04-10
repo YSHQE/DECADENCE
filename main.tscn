@@ -1,0 +1,43 @@
+[gd_scene format=3 uid="uid://crewyrvh1ecde"]
+
+[ext_resource type="PackedScene" uid="uid://ce5g4ongaqpj6" path="res://player/player.tscn" id="1_ig7tw"]
+[ext_resource type="PackedScene" uid="uid://bdwu23e4oqmag" path="res://joystick/joystick.tscn" id="2_0xm2m"]
+[ext_resource type="Texture2D" uid="uid://j1gsj5tkeuw7" path="res://assets/icon.svg" id="3_h2yge"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_0xm2m"]
+size = Vector2(128, 128)
+
+[node name="Main" type="Node2D" unique_id=2007665470]
+
+[node name="Player" parent="." unique_id=1607062957 instance=ExtResource("1_ig7tw")]
+position = Vector2(960, 540)
+
+[node name="Joystick" type="CanvasLayer" parent="." unique_id=1469963969]
+
+[node name="Joystick" parent="Joystick" unique_id=1961635094 instance=ExtResource("2_0xm2m")]
+position = Vector2(320, 760)
+
+[node name="Wall?" type="StaticBody2D" parent="." unique_id=1365851898]
+position = Vector2(1350, 383)
+
+[node name="Sprite" type="Sprite2D" parent="Wall?" unique_id=475889595]
+self_modulate = Color(0, 0, 0, 1)
+texture = ExtResource("3_h2yge")
+
+[node name="Collision" type="CollisionShape2D" parent="Wall?" unique_id=978880820]
+shape = SubResource("RectangleShape2D_0xm2m")
+
+[node name="Label" type="Label" parent="Wall?" unique_id=2081068906]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -36.0
+offset_top = -21.0
+offset_right = 36.0
+offset_bottom = 21.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 30
+text = "wall?"

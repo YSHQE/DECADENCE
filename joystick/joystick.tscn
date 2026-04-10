@@ -1,0 +1,19 @@
+[gd_scene format=3 uid="uid://bdwu23e4oqmag"]
+
+[ext_resource type="Script" uid="uid://ccyr25sb0ndyq" path="res://joystick/joystick.gd" id="1_5xy0b"]
+[ext_resource type="Texture2D" uid="uid://j1gsj5tkeuw7" path="res://assets/icon.svg" id="1_e7m0p"]
+
+[node name="Joystick" type="Node2D" unique_id=1961635094]
+script = ExtResource("1_5xy0b")
+
+[node name="Base" type="Sprite2D" parent="." unique_id=791456929]
+modulate = Color(1, 1, 1, 0.19607843)
+self_modulate = Color(0, 0, 0, 1)
+scale = Vector2(2, 2)
+texture = ExtResource("1_e7m0p")
+
+[node name="Stick" type="Marker2D" parent="." unique_id=1371806466]
+
+[node name="Sprite" type="Sprite2D" parent="Stick" unique_id=747899929]
+modulate = Color(0, 0, 0, 1)
+texture = ExtResource("1_e7m0p")
