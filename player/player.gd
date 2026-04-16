@@ -5,7 +5,7 @@ class_name Player extends CharacterBody2D
 @export var move_speed: float = 700.0
 @export_subgroup("Dash")
 @export var dash_speed: float = 1500.0
-@export var dash_distance: float = 200.0
+@export var dash_distance: float = 500.0
 
 enum State {
 	IDLE,
@@ -16,8 +16,9 @@ enum State {
 
 var current_state: State = State.IDLE
 
-var can_dash: bool = true
 var dashing: bool = false
+var can_dash: bool = true
+var dash_distance_remaining: float = 0.0
 var dash_target_point: Vector2 = Vector2.ZERO
 
 
@@ -36,7 +37,7 @@ func _physics_process(delta: float) -> void:
 		State.IDLE: _process_idle()
 		State.MOVING: _process_moving(move_dir)
 		State.START_DASH: _process_start_dash()
-		State.DASHING: _process_dashing()
+		State.DASHING: _process_dashing(delta)
 
 	# Transition states
 	if dashing:
@@ -53,17 +54,10 @@ func _physics_process(delta: float) -> void:
 
 func print_state(state: int) -> String:
 	match state:
-		State.IDLE:
-			return "idle"
-		State.MOVING:
-			print("moving")
-			return "moving"
-		State.START_DASH:
-			print("start_dash")
-			return "start_dash" 
-		State.DASHING:
-			print("dashing")
-			return "dashing"
+		State.IDLE: return "idle"
+		State.MOVING: return "moving"
+		State.START_DASH: return "start_dash" 
+		State.DASHING: return "dashing"
 	return "man idk"
 
 
@@ -78,6 +72,7 @@ func _process_moving(dir: Vector2) -> void:
 
 func _process_start_dash() -> void:
 	can_dash = false
+	dash_distance_remaining = dash_distance
 
 	var dash_dir = (get_global_mouse_position() - global_position).normalized()
 	dash_target_point = dash_dir * dash_distance
@@ -85,11 +80,13 @@ func _process_start_dash() -> void:
 	dashing = true
 
 
-func _process_dashing() -> void:
-	print(global_position.distance_to(to_global(dash_target_point)))
-	
-	# Dash finish condition
-	if global_position.distance_to(to_global(dash_target_point)) < 10.0:
+func _process_dashing(delta: float) -> void:
+	dash_distance_remaining -= get_position_delta().length()
+
+	print("dash_distance_remaining: ", dash_distance_remaining)
+
+	# Dash end condition
+	if dash_distance_remaining <= 0.0:
 		dash_cooldown_timer.start()
 		dashing = false
 		return
