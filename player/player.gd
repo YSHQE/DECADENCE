@@ -10,7 +10,7 @@ class_name Player extends CharacterBody2D
 enum State {
 	IDLE,
 	MOVING,
-	DASH,
+	START_DASH,
 	DASHING,
 }
 
@@ -21,7 +21,7 @@ var dashing: bool = false
 var dash_target_point: Vector2 = Vector2.ZERO
 
 
-@onready var dash_timer: Timer = $DashTimer
+@onready var dash_cooldown_timer: Timer = $DashCooldownTimer
 @onready var state_label: Label = $StateLabel
 
 
@@ -29,34 +29,41 @@ func _physics_process(delta: float) -> void:
 	var move_dir := Input.get_vector(
 		"move_left", "move_right", "move_up", "move_down").normalized()
 
+	state_label.text = print_state(current_state)
+
 	# Process states
 	match current_state:
 		State.IDLE: _process_idle()
 		State.MOVING: _process_moving(move_dir)
-		#State.DASH: _process_dash()
-		#State.DASHING: _process_dashing()
+		State.START_DASH: _process_start_dash()
+		State.DASHING: _process_dashing()
 
 	# Transition states
 	if dashing:
 		current_state = State.DASHING
-	elif dashing and can_dash:
-		current_state = State.DASH
+	elif can_dash and Input.is_action_just_pressed("dash"):
+		current_state = State.START_DASH
 	elif move_dir != Vector2.ZERO:
 		current_state = State.MOVING
 	else:
 		current_state = State.IDLE
-
-	state_label.text = print_state(current_state)
 
 	move_and_slide()
 
 
 func print_state(state: int) -> String:
 	match state:
-		State.IDLE: return "idle"
-		State.MOVING: return "moving"
-		State.DASH: return "dash" 
-		State.DASHING: return "dashing"
+		State.IDLE:
+			return "idle"
+		State.MOVING:
+			print("moving")
+			return "moving"
+		State.START_DASH:
+			print("start_dash")
+			return "start_dash" 
+		State.DASHING:
+			print("dashing")
+			return "dashing"
 	return "man idk"
 
 
@@ -67,3 +74,29 @@ func _process_idle() -> void:
 
 func _process_moving(dir: Vector2) -> void:
 	velocity = dir * move_speed
+
+
+func _process_start_dash() -> void:
+	can_dash = false
+
+	var dash_dir = (get_global_mouse_position() - global_position).normalized()
+	dash_target_point = dash_dir * dash_distance
+
+	dashing = true
+
+
+func _process_dashing() -> void:
+	print(global_position.distance_to(to_global(dash_target_point)))
+	
+	# Dash finish condition
+	if global_position.distance_to(to_global(dash_target_point)) < 10.0:
+		dash_cooldown_timer.start()
+		dashing = false
+		return
+
+	# Dash movement
+	velocity = dash_target_point.normalized() * dash_speed
+
+
+func _on_dash_cooldown_timeout() -> void:
+	can_dash = true
