@@ -1,11 +1,11 @@
-class_name Player extends CharacterBody2D
+class_name Player extends Entity
 
-
-@export_group("Movement")
+@export_subgroup("Movement")
 @export var move_speed: float = 700.0
 @export_subgroup("Dash")
 @export var dash_speed: float = 1500.0
 @export var dash_distance: float = 500.0
+@export var dash_duration: float = 0.5 # in seconds
 
 enum State {
 	IDLE,
@@ -19,6 +19,7 @@ var current_state: State = State.IDLE
 var dashing: bool = false
 var can_dash: bool = true
 var dash_distance_remaining: float = 0.0
+var dash_time_remaining: float = 0.0
 var dash_target_point: Vector2 = Vector2.ZERO
 
 
@@ -26,11 +27,17 @@ var dash_target_point: Vector2 = Vector2.ZERO
 @onready var state_label: Label = $StateLabel
 
 
+func _ready() -> void:
+	if not dash_cooldown_timer.is_connected(
+		"timeout", 
+		_on_dash_cooldown_timeout
+	):
+		dash_cooldown_timer.connect("timeout", _on_dash_cooldown_timeout)
+
+
 func _physics_process(delta: float) -> void:
 	var move_dir := Input.get_vector(
 		"move_left", "move_right", "move_up", "move_down").normalized()
-
-	state_label.text = print_state(current_state)
 
 	# Process states
 	match current_state:
@@ -42,12 +49,15 @@ func _physics_process(delta: float) -> void:
 	# Transition states
 	if dashing:
 		current_state = State.DASHING
-	elif can_dash and Input.is_action_just_pressed("dash"):
+	elif can_dash and Input.is_action_pressed("dash"):
 		current_state = State.START_DASH
 	elif move_dir != Vector2.ZERO:
 		current_state = State.MOVING
 	else:
 		current_state = State.IDLE
+
+	# Debug state
+	state_label.text = print_state(current_state)
 
 	move_and_slide()
 
@@ -73,6 +83,7 @@ func _process_moving(dir: Vector2) -> void:
 func _process_start_dash() -> void:
 	can_dash = false
 	dash_distance_remaining = dash_distance
+	dash_time_remaining = dash_duration
 
 	var dash_dir = (get_global_mouse_position() - global_position).normalized()
 	dash_target_point = dash_dir * dash_distance
@@ -82,11 +93,10 @@ func _process_start_dash() -> void:
 
 func _process_dashing(delta: float) -> void:
 	dash_distance_remaining -= get_position_delta().length()
-
-	print("dash_distance_remaining: ", dash_distance_remaining)
+	dash_time_remaining -= delta
 
 	# Dash end condition
-	if dash_distance_remaining <= 0.0:
+	if dash_distance_remaining <= 0.0 or dash_time_remaining <= 0.0:
 		dash_cooldown_timer.start()
 		dashing = false
 		return
