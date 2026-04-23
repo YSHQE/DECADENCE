@@ -2,11 +2,25 @@ class_name Player extends Entity
 
 @export_subgroup("Movement")
 @export var move_speed: float = 700.0
+
 @export_subgroup("Dash")
 @export var dash_speed: float = 1500.0
 @export var dash_distance: float = 500.0
 @export var dash_duration: float = 0.5 # in seconds
 @export var dash_cooldown: float = 0.2 # in seconds
+
+# This is very unstable
+@export_subgroup("Node References")
+@export var kit_slot_1: KitSlot:
+	get:
+		if not kit_slot_1:
+			kit_slot_1 = get_tree().get_nodes_in_group("KitSlots")[0]
+		return kit_slot_1
+@export var kit_slot_2: KitSlot:
+	get:
+		if not kit_slot_2:
+			kit_slot_2 = get_tree().get_nodes_in_group("KitSlots")[1]
+		return kit_slot_2
 
 enum State {
 	IDLE,
@@ -17,6 +31,13 @@ enum State {
 
 var current_state: State = State.IDLE
 
+enum Kit {
+	ABILITY,
+	WEAPON,
+}
+
+var current_kit: Kit = Kit.ABILITY
+
 var dashing: bool = false
 var can_dash: bool = true
 var dash_distance_remaining: float = 0.0
@@ -26,7 +47,9 @@ var dash_target_point: Vector2 = Vector2.ZERO
 
 
 @onready var dash_cooldown_timer: Timer = $DashCooldownTimer
+
 @onready var state_label: Label = $StateLabel
+@onready var kit_slot_label: Label = $"../UI/KitSlots/Label"
 
 
 func _ready() -> void:
@@ -111,6 +134,26 @@ func _dash_setup() -> void:
 		dash_cooldown_timer.connect("timeout", _on_dash_cooldown_timeout)
 	dash_recharge_time = dash_cooldown
 	dash_cooldown_timer.wait_time = dash_recharge_time
+
+
+func change_kit(new: Kit) -> void:
+	current_kit = new
+	_update_kit(current_kit)
+
+
+func _update_kit(new: Kit) -> void:
+	# Placeholder
+	match new:
+		Kit.ABILITY:
+			kit_slot_1.sprite.self_modulate = Color.BURLYWOOD
+			kit_slot_2.sprite.self_modulate = Color.BURLYWOOD
+			kit_slot_label.text = "ability"
+		Kit.WEAPON:
+			kit_slot_1.sprite.self_modulate = Color.DARK_KHAKI
+			kit_slot_2.sprite.self_modulate = Color.DARK_KHAKI
+			kit_slot_label.text = "weapon"
+	kit_slot_1.sprite.self_modulate.a = 0.5
+	kit_slot_2.sprite.self_modulate.a = 0.5
 
 
 func _on_dash_cooldown_timeout() -> void:

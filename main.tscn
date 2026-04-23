@@ -3,8 +3,10 @@
 [ext_resource type="PackedScene" uid="uid://b5pw8bd1ekhmx" path="res://entity/player/player.tscn" id="1_ig7tw"]
 [ext_resource type="PackedScene" uid="uid://b0wi1ytak6m0c" path="res://entity/enemy/enemy.tscn" id="3_1bvp3"]
 [ext_resource type="Texture2D" uid="uid://j1gsj5tkeuw7" path="res://assets/icon.svg" id="3_h2yge"]
-[ext_resource type="PackedScene" uid="uid://2njfptlxeogb" path="res://joystick/move/move_joystick.tscn" id="4_1bvp3"]
-[ext_resource type="PackedScene" uid="uid://bbgwghw3gnl5f" path="res://joystick/dash/dash_joystick.tscn" id="5_lquwl"]
+[ext_resource type="PackedScene" uid="uid://2njfptlxeogb" path="res://ui/joystick/move/move_joystick.tscn" id="4_1bvp3"]
+[ext_resource type="PackedScene" uid="uid://bbgwghw3gnl5f" path="res://ui/joystick/dash/dash_joystick.tscn" id="5_lquwl"]
+[ext_resource type="PackedScene" uid="uid://cr1dmt2kdqbq" path="res://ui/kit_changer/kit_changer.tscn" id="6_7mycd"]
+[ext_resource type="PackedScene" uid="uid://ffv2qbemconk" path="res://ui/kits/kit_slot.tscn" id="7_272bh"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_0xm2m"]
 size = Vector2(128, 128)
@@ -12,7 +14,7 @@ size = Vector2(128, 128)
 [node name="Main" type="Node2D" unique_id=2007665470]
 
 [node name="Wall" type="StaticBody2D" parent="." unique_id=1365851898]
-position = Vector2(1350, 383)
+position = Vector2(954, 446)
 
 [node name="Sprite" type="Sprite2D" parent="Wall" unique_id=475889595]
 self_modulate = Color(0, 0, 0, 1)
@@ -36,20 +38,56 @@ grow_vertical = 2
 theme_override_font_sizes/font_size = 30
 text = "wall"
 horizontal_alignment = 1
+metadata/_edit_use_anchors_ = true
 
-[node name="Player" parent="." unique_id=1607062957 instance=ExtResource("1_ig7tw")]
-position = Vector2(960, 540)
+[node name="Player" parent="." unique_id=1607062957 node_paths=PackedStringArray("kit_slot_1", "kit_slot_2") instance=ExtResource("1_ig7tw")]
+position = Vector2(597, 448)
+kit_slot_1 = NodePath("../UI/KitSlots/KitSlot1")
+kit_slot_2 = NodePath("../UI/KitSlots/KitSlot2")
 
 [node name="Enemy" parent="." unique_id=1584016522 instance=ExtResource("3_1bvp3")]
-position = Vector2(1714, 213)
+position = Vector2(1310, 436)
 move_speed = 500.0
 attack_distance = 350.0
 
-[node name="Joystick" type="CanvasLayer" parent="." unique_id=845837963]
+[node name="UI" type="CanvasLayer" parent="." unique_id=845837963]
 
-[node name="MoveJoystick" parent="Joystick" unique_id=1104781509 instance=ExtResource("4_1bvp3")]
+[node name="KitChanger" parent="UI" unique_id=1641449536 instance=ExtResource("6_7mycd")]
+position = Vector2(1248, 768)
+
+[node name="Label" type="Label" parent="UI/KitChanger" unique_id=1818219709]
+offset_top = 8.0
+offset_right = 128.0
+offset_bottom = 120.0
+theme_override_font_sizes/font_size = 25
+text = "kit
+change"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="MovementJoysticks" type="Node2D" parent="UI" unique_id=1011676612]
+
+[node name="MoveJoystick" parent="UI/MovementJoysticks" unique_id=1104781509 instance=ExtResource("4_1bvp3")]
 position = Vector2(288, 800)
 
-[node name="DashJoystick" parent="Joystick" unique_id=374660230 node_paths=PackedStringArray("player") instance=ExtResource("5_lquwl")]
+[node name="DashJoystick" parent="UI/MovementJoysticks" unique_id=374660230 node_paths=PackedStringArray("player") instance=ExtResource("5_lquwl")]
 position = Vector2(1632, 800)
-player = NodePath("../../Player")
+player = NodePath("../../../Player")
+
+[node name="KitSlots" type="Node2D" parent="UI" unique_id=1882032321]
+
+[node name="KitSlot1" parent="UI/KitSlots" unique_id=689432236 groups=["KitSlots"] instance=ExtResource("7_272bh")]
+position = Vector2(1552, 488)
+
+[node name="KitSlot2" parent="UI/KitSlots" unique_id=1917851854 groups=["KitSlots"] instance=ExtResource("7_272bh")]
+position = Vector2(1712, 488)
+
+[node name="Label" type="Label" parent="UI/KitSlots" unique_id=1900371163]
+offset_left = 1488.0
+offset_top = 376.0
+offset_right = 1776.0
+offset_bottom = 418.0
+theme_override_font_sizes/font_size = 30
+text = "kit"
+horizontal_alignment = 1
+vertical_alignment = 1

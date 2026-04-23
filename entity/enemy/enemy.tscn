@@ -3,9 +3,13 @@
 [ext_resource type="PackedScene" uid="uid://cpabo0ugatel3" path="res://entity/entity.tscn" id="1_8vdsg"]
 [ext_resource type="Texture2D" uid="uid://j1gsj5tkeuw7" path="res://assets/icon.svg" id="2_lvn57"]
 [ext_resource type="Script" uid="uid://bculcchoe4wdu" path="res://entity/enemy/enemy.gd" id="2_pmu85"]
+[ext_resource type="PackedScene" uid="uid://d3fcyi7c2soig" path="res://hbox/hurtbox/hurtbox.tscn" id="4_0p2mk"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_lvn57"]
 size = Vector2(192, 192)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_7mx5f"]
+size = Vector2(200, 200)
 
 [node name="Enemy" unique_id=1584016522 instance=ExtResource("1_8vdsg")]
 script = ExtResource("2_pmu85")
@@ -33,3 +37,8 @@ grow_vertical = 2
 theme_override_font_sizes/font_size = 35
 text = "state"
 horizontal_alignment = 1
+
+[node name="Hurtbox" parent="." index="3" unique_id=160118446 instance=ExtResource("4_0p2mk")]
+
+[node name="Collision" type="CollisionShape2D" parent="Hurtbox" index="0" unique_id=1438065616]
+shape = SubResource("RectangleShape2D_7mx5f")
